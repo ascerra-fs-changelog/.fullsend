@@ -1,0 +1,31 @@
+# fullsend organization configuration
+# https://github.com/fullsend-ai/fullsend
+#
+# This file is managed by fullsend. Manual edits may be overwritten.
+version: "1"
+dispatch:
+    platform: github-actions
+inference:
+    provider: vertex
+defaults:
+    roles:
+        - fullsend
+        - triage
+        - coder
+        - review
+    max_implementation_retries: 2
+    auto_merge: false
+agents:
+    - role: fullsend
+      name: ascerra-fs-changelog-fullsend
+      slug: ascerra-fs-changelog-fullsend
+    - role: triage
+      name: ascerra-fs-changelog-triage
+      slug: ascerra-fs-changelog-triage
+    - role: coder
+      name: ascerra-fs-changelog-coder
+      slug: ascerra-fs-changelog-coder
+    - role: review
+      name: ascerra-fs-changelog-review
+      slug: ascerra-fs-changelog-review
+repos: {}
