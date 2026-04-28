@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "changelog-result.schema.json",
+  "title": "Changelog Agent Result",
+  "description": "Structured output from the changelog agent, validated by the harness before the post-script runs (ADR 0022).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["action"],
+  "properties": {
+    "action": {
+      "type": "string",
+      "enum": ["changelog-ready", "failure"]
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "changes": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/change" },
+      "minItems": 1,
+      "maxItems": 20
+    },
+    "semver_bump": {
+      "type": "string",
+      "enum": ["patch", "minor", "major"]
+    },
+    "reason": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2000
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "action": { "const": "changelog-ready" } }, "required": ["action"] },
+      "then": { "required": ["summary", "changes", "semver_bump"] }
+    },
+    {
+      "if": { "properties": { "action": { "const": "failure" } }, "required": ["action"] },
+      "then": {
+        "required": ["reason"],
+        "not": {
+          "anyOf": [
+            { "required": ["summary"] },
+            { "required": ["changes"] },
+            { "required": ["semver_bump"] }
+          ]
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "change": {
+      "type": "object",
+      "required": ["type", "description"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["added", "changed", "deprecated", "removed", "fixed", "security"]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "pr_number": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

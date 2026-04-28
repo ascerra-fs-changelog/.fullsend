@@ -28,4 +28,6 @@ agents:
     - role: review
       name: ascerra-fs-changelog-review
       slug: ascerra-fs-changelog-review
-repos: {}
+repos:
+    test-repo:
+        enabled: true

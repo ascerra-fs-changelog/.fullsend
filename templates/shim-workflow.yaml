@@ -100,3 +100,23 @@ jobs:
             --field event_type="$EVENT_TYPE" \
             --field source_repo="$SOURCE_REPO" \
             --field event_payload="$EVENT_PAYLOAD"
+
+  dispatch-changelog:
+    runs-on: ubuntu-latest
+    if: >-
+      github.event_name == 'issues' && github.event.action == 'labeled'
+        && github.event.label.name == 'changelog'
+    steps:
+      - name: Dispatch changelog
+        env:
+          GH_TOKEN: ${{ secrets.FULLSEND_DISPATCH_TOKEN }}
+          EVENT_PAYLOAD: ${{ toJSON(github.event) }}
+          EVENT_TYPE: ${{ github.event_name }}
+          SOURCE_REPO: ${{ github.repository }}
+          DISPATCH_REPO: ${{ github.repository_owner }}/.fullsend
+        run: |
+          gh workflow run changelog.yml \
+            --repo "$DISPATCH_REPO" \
+            --field event_type="$EVENT_TYPE" \
+            --field source_repo="$SOURCE_REPO" \
+            --field event_payload="$EVENT_PAYLOAD"

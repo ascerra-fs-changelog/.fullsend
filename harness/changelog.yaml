@@ -1,0 +1,32 @@
+agent: agents/changelog.md
+model: opus
+image: ghcr.io/fullsend-ai/fullsend-sandbox:latest
+policy: policies/changelog.yaml
+
+host_files:
+  - src: env/gcp-vertex.env
+    dest: /tmp/workspace/.env.d/gcp-vertex.env
+    expand: true
+  - src: ${GOOGLE_APPLICATION_CREDENTIALS}
+    dest: /tmp/workspace/.gcp-credentials.json
+  - src: env/changelog.env
+    dest: /tmp/workspace/.env.d/changelog.env
+    expand: true
+
+skills:
+  - skills/changelog-generation
+
+pre_script: scripts/pre-changelog.sh
+
+validation_loop:
+  script: scripts/validate-output-schema.sh
+  max_iterations: 2
+
+post_script: scripts/post-changelog.sh
+
+runner_env:
+  GITHUB_ISSUE_URL: ${GITHUB_ISSUE_URL}
+  GH_TOKEN: ${GH_TOKEN}
+  FULLSEND_OUTPUT_SCHEMA: ${FULLSEND_DIR}/schemas/changelog-result.schema.json
+
+timeout_minutes: 10
